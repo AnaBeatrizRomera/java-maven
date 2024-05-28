@@ -12,6 +12,6 @@ RUN mvn package
 
 FROM openjdk:17-slim
 
-COPY --from=builder /app/target/nome-do-seu-arquivo.jar /app/app.jar
+COPY --from=builder /app/target/.idea/jarRepositories.xml /app/app.jar
 
 CMD ["java", "-jar", "/app/app.jar"]
