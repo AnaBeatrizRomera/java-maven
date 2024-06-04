@@ -30,27 +30,30 @@ jobs:
     - name: Get the latest tag
       id: get_latest_tag
       run: |
-        latest_tag=$(git tag --list | sort -V | tail -n1)
+        latest_tag=$(git tag --list | grep -E '^[0-9]+\.[0-9]+$' | sort -V | tail -n1)
         if [ -z "$latest_tag" ]; then
-          echo "::set-output name=LATEST_TAG::none"
+          echo "none" > latest_tag.txt
         else
-          echo "::set-output name=LATEST_TAG::$latest_tag"
+          echo "$latest_tag" > latest_tag.txt
         fi
 
     - name: Increment version
       id: inc_version
       run: |
-        if [ "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" == "none" ]; then
+        latest_tag=$(cat latest_tag.txt)
+        if [ "$latest_tag" == "none" ]; then
           echo "::set-output name=NEW_VERSION::1.0"
         else
-          major_version=$(echo "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" | awk -F. '{print $1}')
+          major_version=$(echo "$latest_tag" | awk -F. '{print $1}')
           new_major_version=$((major_version + 1))
           echo "::set-output name=NEW_VERSION::${new_major_version}.0"
         fi
+
     - name: Update POM version
       run: |
         mvn versions:set -DnewVersion=${{ steps.inc_version.outputs.NEW_VERSION }}
         mvn versions:commit
+
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
