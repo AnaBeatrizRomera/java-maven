@@ -58,7 +58,7 @@ jobs:
       name: Build & push Docker image
       with:
         image: anabeatrizromera/java-maven
-        tags: ${{ steps.inc_version.outputs.NEW_VERSION }}
+        tags: 1,lasted,${{ steps.inc_version.outputs.NEW_VERSION }}
         registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
