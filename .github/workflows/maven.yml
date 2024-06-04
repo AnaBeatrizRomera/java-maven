@@ -37,6 +37,6 @@ jobs:
         registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }} como fazer o versionamento automatico
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
 
