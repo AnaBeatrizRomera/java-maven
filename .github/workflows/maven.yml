@@ -47,7 +47,6 @@ jobs:
           new_major_version=$((major_version + 1))
           echo "::set-output name=NEW_VERSION::${new_major_version}.0"
         fi
-
     - name: Update POM version
       run: |
         mvn versions:set -DnewVersion=${{ steps.inc_version.outputs.NEW_VERSION }}
