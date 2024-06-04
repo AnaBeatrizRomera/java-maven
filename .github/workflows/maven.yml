@@ -27,13 +27,22 @@ jobs:
         java-version: '19'
         distribution: 'temurin'
         cache: maven
-    - name: Get the current version
-      id: get_version
-      run: echo ::set-output name=VERSION::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+    - name: Get the latest tag
+      id: get_latest_tag
+      run: |
+        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+        echo "::set-output name=LATEST_TAG::${latest_tag}"
 
     - name: Increment version
       id: inc_version
-      run: echo ::set-output name=NEW_VERSION::$(echo "${{ steps.get_version.outputs.VERSION }}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+      run: |
+        if [ -z "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" ]; then
+          echo "::set-output name=NEW_VERSION::1.0"
+        else
+          major_version=$(echo "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" | awk -F. '{print $1}')
+          new_major_version=$((major_version + 1))
+          echo "::set-output name=NEW_VERSION::${new_major_version}.0"
+        fi
 
     - name: Update POM version
       run: |
